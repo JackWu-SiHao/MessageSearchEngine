@@ -7,6 +7,8 @@
 #include <sstream>
 #include <queue>
 
+bool isBeginOfDialog(const std::wstring& wstrLine);
+
 int main(int argc, char const* argv[])
 {
 	//_setmode(_fileno(stdout), _O_U16TEXT);
@@ -25,46 +27,40 @@ int main(int argc, char const* argv[])
 
 	std::wifstream infile("inputdata1.txt");
 	std::wstring wstrLine;
+	std::wstreampos posDialogBegin = 0;
+
 	while (std::getline(infile, wstrLine))
-	{
-		//std::wistringstream wiss(wstrLine);
+	{	
+		// stores the position of the begin of dialog
+		if (isBeginOfDialog(wstrLine))
+		{
+			posDialogBegin = infile.tellg();
+		}
+
 		// find the specified message
 		if (wstrLine.find(wstrMessage) != std::wstring::npos)
 		{
+			// message is found
 			std::wcout << wstrLine << std::endl;
-			// I think we should also show the file opened
+
+			// get back to the position of begin if dialog to retrieve the whole 
+			// dialog message section
+			infile.seekg(posDialogBegin);
+
+			// print out again
 		}
 	}
 
 	/*std::wcin >> wstrMessage;
 	std::wcout << wstrMessage << std::endl;*/
 
-#if 0
-
-	// std::wcout << L"§d±ã¯E" << std::endl;
-	// std::wcout << "Test Englishg" << std::endl;
-
-	std::wstring wstrChinese(L"§d±ã¯E");
-	std::wcout << wstrChinese << ", size = " << wstrChinese.size() << std::endl;
-
-	int i = 0;
-	std::wcout << wstrChinese[i++] << ' ' << wstrChinese[i++] << ' ' << wstrChinese[i++] << ' ' << std::endl;
-
-	std::wstring wstrEng(L"Jack");
-	std::wcout << wstrEng << ", size = " << wstrEng.size() << std::endl;
-
-	//int i = 0;
-	//std::wcout << wstrEng[i++] << ' ' << wstrEng[i++] << ' ' << wstrEng[i++] << ' ' << std::endl;
-
-	std::string strEng("Jack");
-	std::wcout << strEng[0] << std::endl;
-	std::wcout << L"haha" << std::endl;
-	//std::wcout << std::wstring(strEng.begin(), strEng.end()) << std::endl;
-	
-	//std::u32string u32strAA(U"Jack");
-	//std::cout << u32strAA << std::endl;
-
-#endif
-
 	return 0;
+}
+
+bool isBeginOfDialog(const std::wstring& wstrLine)
+{
+	// begin of dialog like:
+	// [2020/04/20 xxx)>]
+	// ...
+	return true;
 }
